@@ -2,10 +2,13 @@ require('dotenv').config()
 const bodyParser = require('body-parser');
 const express = require('express');
 const authRoutes = require('./routes/authRoutes');
-
-
+const dbConnect = require('./config/connection');
+const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
+
+
+dbConnect();
 
 
 app.use((req, res, next) => {
@@ -25,8 +28,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-//routes 
+//routes
+app.get('/',(req, res)=>{
+  res.send('OK')
+}); 
 app.use('/api/auth', authRoutes);
+
+app.get('/protected', authMiddleware, (req, res)=>{
+  res.send('OK');
+})
 
 
 //listen

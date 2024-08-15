@@ -1,11 +1,19 @@
+
+const mongoose = require("mongoose");
 require('dotenv').config()
-const mysql = require('mysql2/promise');
 
-const connection = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DATABASE_NAME,
-});
+async function dbConnect() {
+  mongoose
+    .connect(
+        process.env.DB_URL
+    )
+    .then(() => {
+      console.log("Successfully connected to MongoDB Atlas!");
+    })
+    .catch((error) => {
+      console.log("Unable to connect to MongoDB Atlas!");
+      console.error(error);
+    });
+}
 
-export default connection;
+module.exports = dbConnect;
