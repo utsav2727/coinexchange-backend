@@ -4,23 +4,33 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../modal/UserModal");
 
+
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({email:email});
 
-  if (!user) return res.status(400).send("Invalid username or password.");
+  if (!user) return res.status(400).json({
+    status:false,
+    msg:'user not found'
+  });
 
   const validPassword = await bcrypt.compare(password, user.password);
 
   if (!validPassword)
-    return res.status(400).send("Invalid username or password.");
+    return res.status(400).json({
+      status:false,
+      msg:'invalid password'
+    });
 
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
+  const token = jwt.sign({ userId: user.id, userName: user.username }, process.env.JWT_SECRET);
 
   user.password = 'you can\'t see password';
 
   res.json({
+   status: true,
+   msg:'login success',
    user:user,
    token 
   })
@@ -32,7 +42,10 @@ router.post("/register", async (req, res) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: "Username already exists." });
+      return res.status(400).json({
+        status:false,
+        msg:'Email already exists'
+      });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -45,14 +58,40 @@ router.post("/register", async (req, res) => {
     });
 
     const savedUser = await user.save();
+
+    const token = jwt.sign({ userId: savedUser.id, userName: savedUser.username }, process.env.JWT_SECRET)
+
     res.json({
-      message: "User registered successfully",
+      status:true,
+      msg: "User registered successfully",
       userId: savedUser._id,
+      token
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ 
+      status:false,
+      msg:'Internal server error'
+    });
   }
 });
+
+router.post("/verifyToken", async (req, res)=>{
+  try {
+    const token = await req.headers.authorization.split(" ")[1];
+
+    const decodedToken = await jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await decodedToken;
+    req.user = user;
+    res.status(200).json({user})
+  } catch (error) {
+    console.log('error', error);
+    res.status(401).json({
+      status:false,
+      err:'Unauthorized access'
+    })
+  }
+})
 
 module.exports = router;

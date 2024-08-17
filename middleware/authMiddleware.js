@@ -12,9 +12,6 @@ module.exports = async (request, response, next) => {
     console.log('user logged in', user);
     next();    
   } catch (error) {
-    response.redirect('https://mongoosejs.com/docs/guide.html')
-    // response.status(401).json({
-    //   error: new Error("Invalid request!"),
-    // });
+    response.redirect('/signin')
   }
 };
