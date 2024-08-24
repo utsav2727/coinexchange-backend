@@ -2,7 +2,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const User = require("../modal/UserModal");
+const User = require("../model/UserModel");
 
 
 
@@ -86,7 +86,7 @@ router.post("/verifyToken", async (req, res)=>{
     req.user = user;
     res.status(200).json({user})
   } catch (error) {
-    console.log('error', error);
+    // console.log('error', error);
     res.status(401).json({
       status:false,
       err:'Unauthorized access'

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../modal/UserModal"); // Adjust the path as necessary
+const User = require("../model/UserModel"); // Adjust the path as necessary
 
 // Create a new user
 router.post("/register", async (req, res) => {
@@ -39,10 +39,7 @@ router.get("/users/:id", async (req, res) => {
 // Update a user by ID
 router.put("/users/:id", async (req, res) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body);
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
