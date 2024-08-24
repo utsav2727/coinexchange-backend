@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const currencyRoutes = require('./routes/currencyRoutes');
 const dbConnect = require('./config/connection');
 const authMiddleware = require('./middleware/authMiddleware');
 const cors = require('cors');
@@ -23,8 +24,10 @@ app.get('/api/test',(req, res)=>{
   res.send('OK')
 }); 
 app.use('/api/auth', authRoutes);
-
 app.use('/api/',userRoutes);
+app.use('/api/currency',currencyRoutes);
+
+
 
 
 app.get('/protected', authMiddleware, (req, res)=>{
