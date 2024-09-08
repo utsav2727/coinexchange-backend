@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const TradeSchema = new mongoose.Schema({
+const TradeHistorySchema = new mongoose.Schema({
   type: {
     type: String,
     enum: ["buy", "sell"],
@@ -55,9 +55,9 @@ const TradeSchema = new mongoose.Schema({
   },
 });
 
-TradeSchema.pre("save", function (next) {
+TradeHistorySchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-module.exports = mongoose.model("Trade", TradeSchema);
+module.exports = mongoose.model("Trade", TradeHistorySchema);

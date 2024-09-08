@@ -24,6 +24,7 @@ router.post('/', async (req, res) => {
     symbol: req.body.symbol,
     tag: req.body.tag,
     conversionRate: req.body.conversionRate,
+    baseCurrency: req.body.baseCurrency
   });
 
   try {
