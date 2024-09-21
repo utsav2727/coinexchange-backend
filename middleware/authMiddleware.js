@@ -12,6 +12,8 @@ module.exports = async (request, response, next) => {
     console.log('user logged in', user);
     next();    
   } catch (error) {
-    response.redirect('/signin')
+    response.status(403).json({message:"Unauthorized"});
+    return
+    // response.redirect('http://localhost:3000/signin')
   }
 };

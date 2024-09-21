@@ -1,14 +1,9 @@
 const mongoose = require("mongoose");
 
-const WalletSchema = new mongoose.Schema({
+const TransactionSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId, // Reference to the User model
     ref: "Users",
-    required: true,
-  },
-  currencyId: {
-    type: mongoose.Schema.Types.ObjectId, // Reference to the Currency model
-    ref: "Currency",
     required: true,
   },
   amount: {
@@ -16,9 +11,9 @@ const WalletSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
-  onHold:{
-    type: Number,
-    default: 0,
+  type:{
+    type: String,
+    required: true
   },
   createdAt: {
     type: Date,
@@ -31,9 +26,9 @@ const WalletSchema = new mongoose.Schema({
 });
 
 // Automatically update the `updatedAt` field before saving
-WalletSchema.pre("save", function (next) {
+TransactionSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-module.exports = mongoose.model("Wallet", WalletSchema);
+module.exports = mongoose.model("Transaction", TransactionSchema);

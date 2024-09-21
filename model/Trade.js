@@ -35,7 +35,7 @@ const TradeSchema = new mongoose.Schema({
     required: true,
     default:0
   },
-  paymentAddress: {
+  prefferedpaymentType: {
     type: String,
   },
   paymentWindow: {
@@ -59,5 +59,11 @@ TradeSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
+
+TradeSchema.index({ type: 1 });
+TradeSchema.index({ buyer: 1 });
+TradeSchema.index({ seller: 1 });
+TradeSchema.index({ status: 1 });
+TradeSchema.index({ createdAt: -1 }); // Sort by newest first
 
 module.exports = mongoose.model("Trade", TradeSchema);

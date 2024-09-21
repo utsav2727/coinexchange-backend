@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../model/UserModel"); // Adjust the path as necessary
+const authMiddleware = require("../middleware/authMiddleware");
 
 // Create a new user
 router.post("/register", async (req, res) => {
@@ -36,6 +37,30 @@ router.get("/users/:id", async (req, res) => {
   }
 });
 
+router.put("/users/notification", authMiddleware ,async (req, res) => {
+
+  console.log('here');
+  if(!req.user.userId){
+    res.status(400).json({message:"no user found"});
+    return
+  }
+
+  const {token} = req.body;
+  try {
+    const updatedUser = await User.findByIdAndUpdate({
+      _id: req.user.userId
+    }, {
+      notificationToken: token});
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({msg:"registered"});
+  } catch (error) {
+    console.log('error', error);
+    res.status(400).json({ message: error.message });
+  }
+});
+
 // Update a user by ID
 router.put("/users/:id", async (req, res) => {
   try {
@@ -61,5 +86,8 @@ router.delete("/users/:id", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+
+
 
 module.exports = router;

@@ -5,6 +5,7 @@ const DepositTransaction = require('../model/DepositTransaction');
 const StatusRef = require('../model/StatusRef');
 const Currency = require('../model/Currency');
 const Wallet = require('../model/Wallet');
+const Transaction = require('../model/Transactions');
 
 router.get('/', async (req, res) => {
   try {
@@ -70,6 +71,13 @@ router.post('/approve/:id',async (req, res)=>{
         currencyId:currencyId
       });
       console.log('walletResponse', walletResponse);
+      
+      await Transaction.create({
+        userId: userId, 
+        type: "credit",
+        amount:walletAmt
+      });
+
     }else{
       //existing
       walletAmt = existingUserWallet.amount + (parseFloat(response.amount) - parseFloat(response.charge));
@@ -79,10 +87,12 @@ router.post('/approve/:id',async (req, res)=>{
         currencyId:currencyId
       });
       console.log('walletResponse', walletResponse);
+      await Transaction.create({
+        userId: userId, 
+        type: "credit",
+        amount:walletAmt
+      });
     }
-
-    
-
     
 
     res.status(200).json(response);
@@ -146,6 +156,7 @@ router.post('/', async (req, res) => {
     const newDeposit = await deposit.save();
     res.status(201).json(newDeposit);
   } catch (err) {
+    console.log('err',err);
     res.status(400).json({ message: err.message });
   }
 });

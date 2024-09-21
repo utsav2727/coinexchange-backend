@@ -3,8 +3,10 @@ const express = require('express');
 const Chat = require('../model/Chat');
 const authMiddleware = require('../middleware/authMiddleware');
 const router = express.Router();
+let admin = require("firebase-admin");
+const UserModel = require('../model/UserModel');
 
-
+const { upload } = require('../config/multerConfig');
 
 router.post('/',authMiddleware ,async (req, res)=>{
     const response = await createChat(req);
@@ -81,22 +83,56 @@ router.get('/fetch/:tradeId/:tradeItemId',authMiddleware ,async (req, res) => {
   });
 
 
-router.post('/createChat', authMiddleware ,async (req, res)=>{
+router.post('/createChat', authMiddleware, upload.single('image'), async (req, res) => {
+    try {
+      console.log('here');
+      const userId = req.user.userId;
+      const to = req.body.to;
+      const message = req.body.message;
+      const tradeLineItem = req.body.tradeLineItem;
   
-  try {
-    const userId = req.user.userId;
-    const to = req.body.to;
-    const response = await Chat.create({
-      from:userId,
-      to:to,
-      message:req.body.message,
-      tradeLineItem: req.body.tradeLineItem
-    });
-    res.status(201).json(response)
-  } catch (error) {
-    res.status(500).json(response)
-  }
-});
+      // Check if an image file is uploaded
+      let attachment = null;
+      if (req.file) {
+        attachment = req.file.path;  // Store the uploaded image path
+      }
+  
+      const chat = new Chat({
+        from: userId,
+        to: to,
+        message: message,
+        attachment: attachment,  // Store the image URL/path if uploaded
+        tradeLineItem: tradeLineItem
+      });
+  
+      await chat.save();
+
+    const user = await UserModel.findById({_id:to});
+    
+    console.log('user', user);
+    console.log(user.notificationToken);
+
+    if(user.notificationToken){
+
+      const message = {
+        notification: {
+          title: "You have a message.",
+          body: "Kindly check ongoing trade message.",
+        },
+        token: user.notificationToken,
+      };
+
+      const response = await admin.messaging().send(message);
+
+      console.log('notification ', response);
+    }
+
+      res.status(201).json(chat);  // Send the saved chat message as response
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: 'Error creating chat message', error });
+    }
+  });
 
 
 

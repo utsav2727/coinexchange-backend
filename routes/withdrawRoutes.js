@@ -5,6 +5,7 @@ const WithdrawTransaction = require('../model/WithdrawTransaction');
 const StatusRef = require('../model/StatusRef');
 const Currency = require('../model/Currency');
 const Wallet = require('../model/Wallet');
+const Transaction = require('../model/Transactions')
 
 router.get('/', async (req, res) => {
   try {
@@ -77,6 +78,11 @@ router.post('/approve/:id',async (req, res)=>{
         currencyId:currencyId
       });
       console.log('walletResponse', walletResponse);
+      await Transaction.create({
+        userId: userId, 
+        type: "debit",
+        amount: walletAmt
+      });
     }
 
     res.status(200).json(response);

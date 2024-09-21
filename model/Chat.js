@@ -43,6 +43,12 @@ chatSchema.pre("save", function (next) {
     next();
   });
 
+chatSchema.index({ from: 1 });
+chatSchema.index({ to: 1 });
+chatSchema.index({ tradeId: 1 });
+chatSchema.index({ tradeLineItem: 1 });
+chatSchema.index({ createdAt: -1 }); // Sort by newest first
+
 const Chat = mongoose.model('Chat', chatSchema);
 
 module.exports = Chat;
